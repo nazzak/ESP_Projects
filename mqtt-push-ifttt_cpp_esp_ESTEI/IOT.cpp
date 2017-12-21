@@ -7,6 +7,13 @@ IOT::IOT()
 
 }
 
+IOT::~IOT()
+{
+  delete m_pushnotif;
+  delete m_clientMqtt;
+  delete m_ifttt;
+}
+
 void IOT::setWIFI(const char * _wifi_ssid,
                   const char * _wifi_pwd)
 {
@@ -30,6 +37,11 @@ void IOT::setMQTT(const char * _mqtt_server,
 
 void IOT::setPUSHOVER(String _token, String _user)
 {
+  if (m_pushnotif != nullptr)
+  {
+    delete m_pushnotif;
+    m_pushnotif = nullptr;
+  }
   m_pushnotif = new Pushover(_token, _user);
 }
 
@@ -37,6 +49,11 @@ void IOT::setIFTTT(String _ifttt_key, String _ifttt_event_name)
 {
   m_ifttt_key = _ifttt_key;
   m_ifttt_event = _ifttt_event_name;
+  if (m_ifttt != nullptr)
+  {
+  delete m_ifttt;
+  m_ifttt = nullptr;
+  }
   m_ifttt = new IFTTTMaker(_ifttt_key, m_espClientSec);
 }
 
@@ -56,7 +73,7 @@ void IOT::go()
 {
   startWifi();
   if (m_clientMqtt != NULL)
-  m_clientMqtt->setServer(m_mqtt_server, 1883);
+    m_clientMqtt->setServer(m_mqtt_server, 1883);
 
   do
   {
@@ -68,11 +85,11 @@ void IOT::go()
       m_clientMqtt->loop();
     }
     delay(5000);
-    
+
     digitalWrite(m_led_state, LOW);
     delay(50);
     digitalWrite(m_led_state, HIGH);
-    
+
     if (m_clientMqtt != NULL)
       m_clientMqtt->publish(m_mqtt_topic, m_toSEND, true);
     else

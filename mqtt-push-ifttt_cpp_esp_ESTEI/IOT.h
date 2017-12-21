@@ -31,6 +31,7 @@ class IOT {
 
   public:
     IOT();
+    ~IOT();
     void go(void);
 
     void setWIFI(const char * _wifi_ssid = WIFI_SSID,
